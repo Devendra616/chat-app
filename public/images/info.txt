@@ -1,0 +1,14 @@
+
+Hope you enjoy your new logo, here are the people that
+made your beautiful logo happen :)
+font name: Lemonada-Regular
+font link: https://fonts.google.com/specimen/Lemonada
+font author: Eduardo Tunni
+font author site: http://www.tipo.net.ar/
+
+
+icon designer: Lucian Dinu
+icon designer link: /luciandinu
+        
+{"bg":"#002C73","icon":"#FFD009","font":"#ffffff","slogan":"#ffffff"}
+      
