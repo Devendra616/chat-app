@@ -3,10 +3,13 @@ var socket = io();
 // get query params from url
 var name = getQueryVariable("name") || 'Anonymous';
 var room = getQueryVariable("room") || 'No Room Selected';
-debugger;
+
 $(".room-title").text(room);
-// fires when client successfully conencts to the server
+/*
+  Triggers when client successfully connected to the server
+*/
 socket.on("connect", function() {
+  
   console.log("Connected to Socket I/O Server!");
   console.log(name + " wants to join  " + room);
   // to join a specific room, client sends joinRoom event to server
@@ -16,9 +19,67 @@ socket.on("connect", function() {
   });
 });
 
+/* 
+  Triggers when client sends message to server
+*/
+socket.on("message", function(message) {
+  console.log("New Message !",message.text); 
+  // insert messages in container
+  var $messages = $(".messages");
+  var $message = $('<li class = "list-group-item"></li>');
+  var momentTimestamp = moment.utc(message.timestamp).local().format("h:mm a");
+  //$(".messages").append($('<p>').text(message.text));
+  $message.append("<strong>" + momentTimestamp + " " + message.name + "</strong>");
+  $message.append("<p>" + message.text + "</p>");
+  $messages.append($message);
+  // manage autoscroll
+  var obj = $("ul.messages.list-group");
+  var offset = obj.offset();
+  var scrollLength = obj[0].scrollHeight;
+  //  offset.top += 20;
+  $("ul.messages.list-group").animate({
+    scrollTop: scrollLength - offset.top
+  });
+
+  // try notify , only when user has not open chat view
+  if (document[hidden]) {
+    notifyMe(message);
+    // also notify server that user has not seen messgae
+    var umsg = {
+      text: name + " has not seen message",
+      read: false
+    };
+    socket.emit("userSeen", umsg);
+  } else {
+    // notify  server that user has seen message
+    var umsg = {
+      text: name + " has seen message",
+      read: true,
+      user: name
+    };
+    socket.emit("userSeen", umsg);
+  }
+});
+
+/* 
+  Triggers when userSeen emitted from server
+*/
+socket.on("userSeen", function(msg) {
+     console.log(msg);
+     var icon = $("#icon-type");
+     icon.removeClass();
+     icon.addClass("fa fa-check-circle");
+     if (msg.read) {
+       //user read the message
+       icon.addClass("msg-read");
+     } else {
+       // message deleiverd but not read yet
+       icon.addClass("msg-delieverd");
+     }
+ });
+
 // below code is to know when typing is there
 var timeout;
-
 function timeoutFunction() {
   typing = false;
   //console.log("stopped typing");
@@ -63,68 +124,8 @@ socket.on("typing", function(message) { //console.log(message.text);
   $(".typing").text(message.text);
 });
 
-socket.on("userSeen", function(msg) {
-
- // if (msg.user == name) {
-    // read message
-    // show messags only to user who has typied
-    var icon = $("#icon-type");
-    icon.removeClass();
-    icon.addClass("fa fa-check-circle");
-    if (msg.read) {
-      //user read the message
-      icon.addClass("msg-read");
-    } else {
-      // message deleiverd but not read yet
-      icon.addClass("msg-delieverd");
-    }
-    console.log(msg);
-  //}
-});
 
 
-//setup for custom events
-socket.on("message", function(message) {
-  console.log("New Message !");
-  console.log(message.text);
-  // insert messages in container
-  var $messages = $(".messages");
-  var $message = $('<li class = "list-group-item"></li>');
-
-  var momentTimestamp = moment.utc(message.timestamp).local().format("h:mm a");
-  //$(".messages").append($('<p>').text(message.text));
-  $message.append("<strong>" + momentTimestamp + " " + message.name + "</strong>");
-  $message.append("<p>" + message.text + "</p>");
-  $messages.append($message);
-  // handle autoscroll
-  // manage autoscroll
-  var obj = $("ul.messages.list-group");
-  var offset = obj.offset();
-  var scrollLength = obj[0].scrollHeight;
-  //  offset.top += 20;
-  $("ul.messages.list-group").animate({
-    scrollTop: scrollLength - offset.top
-  });
-
-  // try notify , only when user has not open chat view
-  if (document[hidden]) {
-    notifyMe(message);
-    // also notify server that user has not seen messgae
-    var umsg = {
-      text: name + " has not seen message",
-      read: false
-    };
-    socket.emit("userSeen", umsg);
-  } else {
-    // notify  server that user has seen message
-    var umsg = {
-      text: name + " has seen message",
-      read: true,
-      user: name
-    };
-    socket.emit("userSeen", umsg);
-  }
-});
 
 // handles submitting of new message
 var $form = $("#messageForm");

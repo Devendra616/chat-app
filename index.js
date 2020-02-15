@@ -46,13 +46,33 @@ io.on('connection',function(socket){
     name: "System"
   });
 
+   // listen ot joinRoom socket event trigger
+   //req is {name:'',room:''}
+   socket.on('joinRoom', function(req) {
+    
+    clientInfo[socket.id] = req;
+    socket.join(req.room);
+    //broadcast new user joined room
+    socket.broadcast.to(req.room).emit("message", {
+      name: "System",
+      text: req.name + ' has joined',
+      timestamp: moment().valueOf()
+    });
+  });
+
   //handle new message from client
   socket.on('message',function(msg){
       msg.timestamp = moment().valueOf();
-         
+      
     //broadcast to all clients in same room
     socket.broadcast.to(clientInfo[socket.id].room).emit("message", msg);      
   });
+
+  // check if user has seen Message
+  socket.on("userSeen", function(msg) {
+    socket.broadcast.to(clientInfo[socket.id].room).emit("userSeen", msg);    
+  });
+
 });
 
 app.get('/messages', (req, res) => {
