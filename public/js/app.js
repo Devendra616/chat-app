@@ -3,6 +3,21 @@ var socket = io();
 // get query params from url
 var name = getQueryVariable("name") || 'Anonymous';
 var room = getQueryVariable("room") || 'No Room Selected';
+// below is the checking for page visibility api
+var hidden, visibilityChange;
+if (typeof document.hidden !== "undefined") { // Opera 12.10 and Firefox 18 and later support
+  hidden = "hidden";
+  visibilityChange = "visibilitychange";
+} else if (typeof document.mozHidden !== "undefined") {
+  hidden = "mozHidden";
+  visibilityChange = "mozvisibilitychange";
+} else if (typeof document.msHidden !== "undefined") {
+  hidden = "msHidden";
+  visibilityChange = "msvisibilitychange";
+} else if (typeof document.webkitHidden !== "undefined") {
+  hidden = "webkitHidden";
+  visibilityChange = "webkitvisibilitychange";
+}
 
 $(".room-title").text(room);
 /*
@@ -78,24 +93,22 @@ socket.on("userSeen", function(msg) {
      }
  });
 
-// below code is to know when typing is there
+// Below code is to know when typing is there
 var timeout;
 function timeoutFunction() {
   typing = false;
-  //console.log("stopped typing");
-  // socket.emit("typing", false);
+  //stopped typing
   socket.emit('typing', {
-    text: "" //name + " stopped typing"
+    text: "" 
   });
 }
-// if key is pressed typing message is seen else auto after 2 sec typing false message is send
+// if key is pressed typing message is seen else auto after 1 sec typing false message is send
 // TODO : add broadcast event when server receives typing event
 $('#messagebox').keyup(function() {
-  console.log('happening');
+  
   typing = true;
   $("#icon-type").removeClass();
-  //console.log("typing typing ....");
-  //socket.emit('typing', 'typing...');
+  
   socket.emit('typing', {
     text: name + " is typing ..."
   });
@@ -103,28 +116,10 @@ $('#messagebox').keyup(function() {
   timeout = setTimeout(timeoutFunction, 1000);
 });
 
-// below is the checking for page visibility api
-var hidden, visibilityChange;
-if (typeof document.hidden !== "undefined") { // Opera 12.10 and Firefox 18 and later support
-  hidden = "hidden";
-  visibilityChange = "visibilitychange";
-} else if (typeof document.mozHidden !== "undefined") {
-  hidden = "mozHidden";
-  visibilityChange = "mozvisibilitychange";
-} else if (typeof document.msHidden !== "undefined") {
-  hidden = "msHidden";
-  visibilityChange = "msvisibilitychange";
-} else if (typeof document.webkitHidden !== "undefined") {
-  hidden = "webkitHidden";
-  visibilityChange = "webkitvisibilitychange";
-}
-
 //listening for typing  event
 socket.on("typing", function(message) { //console.log(message.text);
   $(".typing").text(message.text);
 });
-
-
 
 
 // handles submitting of new message

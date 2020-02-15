@@ -73,6 +73,13 @@ io.on('connection',function(socket){
     socket.broadcast.to(clientInfo[socket.id].room).emit("userSeen", msg);    
   });
 
+   // Show who is typing Message
+   socket.on('typing', function(message) { 
+     // broadcast this message to all users in that room
+    socket.broadcast.to(clientInfo[socket.id].room).emit("typing", message);
+  });  
+
+
 });
 
 app.get('/messages', (req, res) => {
