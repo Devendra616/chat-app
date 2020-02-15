@@ -121,6 +121,11 @@ socket.on("typing", function(message) { //console.log(message.text);
   $(".typing").text(message.text);
 });
 
+$("#logout").on('click',function(){
+  socket.emit('disconnect');
+  socket.disconnect();
+  window.location = "/index.html"; //page you want to redirect
+});
 
 // handles submitting of new message
 var $form = $("#messageForm");
@@ -217,3 +222,11 @@ function notifyMe(msg) {
   // At last, if the user has denied notifications, and you
   // want to be respectful there is no need to bother them any more.
 }
+
+//disable back browsing
+$(document).ready(function() {
+  window.history.pushState(null, "", window.location.href);        
+  window.onpopstate = function() {
+      window.history.pushState(null, "", window.location.href);
+  };
+});

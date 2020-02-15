@@ -36,6 +36,28 @@ app.get('/', function(req, res){
     res.sendFile('index.html');
 });
 
+app.get('/messages', (req, res) => {
+  Message.find({},(err, messages)=> {
+    res.send(messages);
+  })
+});
+
+app.post('/messages', (req, res) => {
+  const message = new Message(req.body);
+  message.save((err) =>{
+      if(err) {
+          sendStatus(500);
+      } else{
+          sendStatus(200);
+      }
+      
+  });
+}); 
+
+app.get('/logout',(req,res)=> {
+
+});
+
 // Listen on connection event for incoming sockets
 io.on('connection',function(socket){
   console.log('connected on index called');
@@ -78,27 +100,25 @@ io.on('connection',function(socket){
      // broadcast this message to all users in that room
     socket.broadcast.to(clientInfo[socket.id].room).emit("typing", message);
   });  
-
-
+/* 
+  Triggers when client disconnects
+*/
+ socket.on("disconnect", function() {
+  var userdata = clientInfo[socket.id];
+  if (typeof(userdata !== undefined)) {
+    socket.leave(userdata.room); // leave the room
+    //broadcast leave room to only memebers of same room
+    socket.broadcast.to(userdata.room).emit("message", {
+      text: userdata.name + " has left",
+      name: "System",
+      timestamp: moment().valueOf()
+    });
+    // delete user data-
+    delete clientInfo[socket.id];
+  }
 });
 
-app.get('/messages', (req, res) => {
-    Message.find({},(err, messages)=> {
-      res.send(messages);
-    })
-  });
-
-app.post('/messages', (req, res) => {
-    const message = new Message(req.body);
-    message.save((err) =>{
-        if(err) {
-            sendStatus(500);
-        } else{
-            sendStatus(200);
-        }
-        
-    });
-});  
+});
 
 // send current users to provided sockets
 function sendCurrentUsers(socket) { // loading current users
