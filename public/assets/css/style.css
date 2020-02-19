@@ -16,7 +16,7 @@
   border-color: #212529;
 }
 
-.well h1{
+.text_color{
   color: #111E47;
   font-size: 25px;
   font-weight: bold;
@@ -24,7 +24,7 @@
   font-family: 'Kaushan Script', cursive;
 }
 
-.well form label{
+.text_color_1{
   color: #6C6B3A;
   font-size: 15px;
 }

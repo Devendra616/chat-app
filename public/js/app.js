@@ -19,7 +19,7 @@ if (typeof document.hidden !== "undefined") { // Opera 12.10 and Firefox 18 and 
   visibilityChange = "webkitvisibilitychange";
 }
 
-$(".room-title").text(room);
+$(".room-title").text(`Room: ${room}`);
 /*
   Triggers when client successfully connected to the server
 */
@@ -44,8 +44,8 @@ socket.on("message", function(message) {
   var $message = $('<li class = "list-group-item"></li>');
   var momentTimestamp = moment.utc(message.timestamp).local().format("h:mm a");
   //$(".messages").append($('<p>').text(message.text));
-  $message.append("<strong>" + momentTimestamp + " " + message.name + "</strong>");
-  $message.append("<p>" + message.text + "</p>");
+  $message.append("<strong>" + message.text + "</strong>");
+  $message.append("<p>" + momentTimestamp + " " + message.name + "</p>");  
   $messages.append($message);
   // manage autoscroll
   var obj = $("ul.messages.list-group");

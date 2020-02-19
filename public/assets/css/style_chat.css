@@ -1,0 +1,48 @@
+p {
+  color: hsl(269, 80%, 12%);
+  margin-bottom: 5px;
+}
+
+.form-control {
+  border-color: #212529;
+}
+
+.text_color{
+  color: #111E47;
+  font-size: 25px;
+  font-weight: bold;
+  text-decoration: underline;
+  font-family: 'Kaushan Script', cursive;
+}
+
+.text_color_1{
+  color: #6C6B3A;
+  font-size: 15px;
+}
+
+.fizzbizz{
+  font-family: 'Press Start 2P', cursive;
+}
+
+.input-group-addon{
+  border-color: #2b3553
+}
+
+.form-control {
+  height: calc(2.25rem + 7.6px);
+  font-size: 14px;
+  background-color: transparent;
+  color:#000;
+}
+
+.form-control:focus {
+  color: white;
+  font-size: 15px;
+  background-color: #5E3082;
+}
+
+.input-group-addon {
+  padding-left: 12px;
+  padding-right: 16px;
+  background: transparent;
+}
