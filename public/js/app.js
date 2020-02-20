@@ -3,6 +3,15 @@ var socket = io();
 // get query params from url
 var name = getQueryVariable("name") || 'Anonymous';
 var room = getQueryVariable("room") || 'No Room Selected';
+const notificationBtn = document.getElementById('enable');
+notificationBtn.addEventListener('click', askNotificationPermission);
+
+ // Do an initial check to see what the notification permission state is  
+ if(Notification.permission === 'denied' || Notification.permission === 'default') {
+  notificationBtn.style.display = 'block';
+} else {
+  notificationBtn.style.display = 'none';
+}
 // below is the checking for page visibility api
 var hidden, visibilityChange;
 if (typeof document.hidden !== "undefined") { // Opera 12.10 and Firefox 18 and later support
@@ -20,6 +29,7 @@ if (typeof document.hidden !== "undefined") { // Opera 12.10 and Firefox 18 and 
 }
 
 $(".room-title").text(`Room: ${room}`);
+
 /*
   Triggers when client successfully connected to the server
 */
@@ -57,7 +67,7 @@ socket.on("message", function(message) {
   });
 
   // try notify , only when user has not open chat view
-  if (document[hidden]) {
+  if (document[hidden]) {console.log('notifyme called');
     notifyMe(message);
     // also notify server that user has not seen messgae
     var umsg = {
@@ -89,7 +99,7 @@ socket.on("userSeen", function(msg) {
        icon.addClass("msg-read");
      } else {
        // message deleiverd but not read yet
-       icon.addClass("msg-delieverd");
+       icon.addClass("msg-delivered");
      }
  });
 
@@ -168,11 +178,11 @@ $form.on("submit", function(event) {
 
 // notification message
 function notifyMe(msg) {
+ 
   // Let's check if the browser supports notifications
   if (!("Notification" in window)) {
-    alert("This browser does not support desktop notification,try Chromium!");
+    alert("This browser does not support desktop notification!");
   }
-
   // Let's check whether notification permissions have already been granted
   else if (Notification.permission === "granted") {
     // If it's okay let's create a notification
@@ -190,13 +200,31 @@ function notifyMe(msg) {
         read: true,
         user: name
       };
-      socket.emit("userSeen", umsg);
-      //window.open('http://www.mozilla.org', '_blank');
+      socket.emit("userSeen", umsg);      
     };
   }
   // Otherwise, we need to ask the user for permission
   else if (Notification.permission !== 'denied') {
-    Notification.requestPermission(function(permission) {
+    Notification.requestPermission().then(function (permission) {
+      // If the user accepts, let's create a notification
+      if (permission === "granted") {
+        var notification = new Notification('Chat App', {
+          body: msg.name + ": " + msg.text,
+          icon: '/images/apple-icon.png' // optional
+        });
+        notification.onclick = function(event) {
+          event.preventDefault();
+          this.close();
+          var umsg = {
+            text: name + " has seen message",
+            read: true,
+            user: name
+          };
+          socket.emit("userSeen", umsg);
+        }
+      }
+    })
+    /* Notification.requestPermission(function(permission) {
       // If the user accepts, let's create a notification
       if (permission === "granted") {
         var notification = new Notification('Chat App', {
@@ -216,12 +244,61 @@ function notifyMe(msg) {
           //window.open('http://www.mozilla.org', '_blank');
         };
       }
-    });
+    }); */ 
   }
-
   // At last, if the user has denied notifications, and you
   // want to be respectful there is no need to bother them any more.
 }
+
+ // askNotificationPermission function to ask for permission when the "Enable notifications" button is clicked
+ function askNotificationPermission() {
+  // function to actually ask the permissions
+  function handlePermission(permission) {
+    // Whatever the user answers, we make sure Chrome stores the information
+    if(!('permission' in Notification)) {
+      Notification.permission = permission;
+    }
+    // set the button to shown or hidden, depending on what the user answers
+    if(Notification.permission === 'denied' || Notification.permission === 'default') {
+      notificationBtn.style.display = 'block';
+      alert("Notifications permission has been blocked. This can be reset in Page Info which can be accessed by clicking the lock/info icon next to the URL");  
+      } else {
+      notificationBtn.style.display = 'none';
+    }
+  }
+
+  // Let's check if the browser supports notifications
+  if (!"Notification" in window) {
+    console.log("This browser does not support notifications.");
+    alert("This browser does not support notifications.");
+  } else {
+    if(checkNotificationPromise()) {
+      Notification.requestPermission()
+      .then((permission) => {
+        handlePermission(permission);
+      })
+      .catch((er)=> {
+        console.error('Error in notification', err);        
+      })
+    } else {
+      Notification.requestPermission(function(permission) {
+        handlePermission(permission);
+      });
+    }
+  }
+}
+
+// Function to check whether browser supports the promise version of requestPermission()
+  // Safari only supports the old callback-based version
+  function checkNotificationPromise() {
+    try {
+      Notification.requestPermission().then();
+    } catch(e) {
+      return false;
+    }
+
+    return true;
+  }
 
 //disable back browsing
 $(document).ready(function() {
