@@ -84,11 +84,17 @@ p {
   align-items: center;
 }
 .vertical-center .container-fluid {
+  max-width: 620px;
   flex-grow:1
 }
 h1 {
   margin: 24px 0;
 }
+
+.list-group-item{
+  font-size: 1.2rem;
+}
+
 .messages p {
   margin: 6px 0;
 }
@@ -120,10 +126,8 @@ ul.messages.list-group {
   margin: auto;
 }
 
-.well .col-md-12:first-child{
-  position: fixed;
-  display: flex;
-  flex-direction: row;
-  justify-content: space-between;
 
+
+.othermessages{
+  text-align: left;
 }

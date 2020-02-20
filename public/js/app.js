@@ -35,13 +35,13 @@ socket.on("connect", function() {
 });
 
 /* 
-  Triggers when client sends message to server
+  Triggers when any client sends message to server
 */
 socket.on("message", function(message) {
   console.log("New Message !",message.text); 
   // insert messages in container
   var $messages = $(".messages");
-  var $message = $('<li class = "list-group-item"></li>');
+  var $message = $('<li class = "list-group-item othermessages"></li>');
   var momentTimestamp = moment.utc(message.timestamp).local().format("h:mm a");
   //$(".messages").append($('<p>').text(message.text));
   $message.append("<strong>" + message.text + "</strong>");
@@ -143,16 +143,16 @@ $form.on("submit", function(event) {
   });
   // show user messageForm
   var $messages = $(".messages");
-  var $message = $('<li class = "list-group-item"></li>');
+  var $message = $('<li class = "list-group-item mymessages"></li>');
 
   var momentTimestamp = moment().format("h:mm a");
-  // $(".messages").append($('<p>').text(message.text));
-  $message.append("<strong>" + momentTimestamp + " " + name + "</strong>");
+  // $(".messages").append($('<p>').text(message.text));  
   //$message.append("<p>" + $message1.val()+ "</p>");
-  $message.append($("<p>", {
-    class: "mymessages",
+  $message.append($("<strong>", {
+    class: "",
     text: $message1.val()
   }));
+  $message.append("<p>" + momentTimestamp + " " + name + "</p>");
   $messages.append($message);
   $message1.val('');
   // manage autoscroll
