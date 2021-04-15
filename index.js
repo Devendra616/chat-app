@@ -8,8 +8,15 @@ var moment = require("moment");
 //socket.io needs http
 var http = require("http").createServer(app);
 
-var clientInfo = {};
+// routes
+import indexRouter from "./routes/index.js";
+import userRouter from "./routes/user.js";
+import roomRouter from "./routes/room.js";
+import deleteRouter from "./routes/delete.js";
+// middlewares
+import { decode } from './middlewares/jwt.js'
 
+var clientInfo = {};
 //socket io module
 var io = require("socket.io")(http);
 //tell express to use static content from public
@@ -17,41 +24,54 @@ app.use(express.static(__dirname+'/public'));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({extended: false}));
 
-/* const dbUrl = "mongodb://devendra:A1359chatapp@ds337718.mlab.com:37718/mlab-chat-app";
-mongoose.connect(dbUrl, (err,msg) =>{
+app.use("/", indexRouter);
+app.use("/users", userRouter);
+app.use("/room", decode, roomRouter);
+app.use("/delete", deleteRouter);
+
+/** catch 404 and forward to error handler */
+app.use('*', (req, res) => {
+  return res.status(404).json({
+    success: false,
+    message: 'API endpoint doesnt exist'
+  })
+});
+
+//db configuration
+//const dbUrl = "mongodb://devendra:A1359chatapp@ds337718.mlab.com:37718/mlab-chat-app";
+const dbUrl = "mongodb+srv://dev:Ld2p7dIGYpcFrXFX@chatapp.hc2jt.mongodb.net/chat-app-db?retryWrites=true&w=majority";
+mongoose.connect(dbUrl, {useNewUrlParser:true,useUnifiedTopology: true },(err,msg) =>{
     if(err){
         console.log("Error connection db! ", err);
     }else {
         console.log("Connected to db! ");
     }
-}); */
+});
 
-/* const Message = mongoose.model('Message',{
+ const Message = mongoose.model('Message',{
     name:String,
     message:String
 });
- */
+ 
 app.get('/', function(req, res){
     //res.sendFile(__dirname + '/index.html');
     res.sendFile('index.html');
 });
 
-app.get('/messages', (req, res) => {
-  Message.find({},(err, messages)=> {
+app.get('/messages', async (req, res) => {
+  await Message.find({},(err, messages)=> {
     res.send(messages);
   })
 });
 
-app.post('/messages', (req, res) => {
-  const message = new Message(req.body);
-  message.save((err) =>{
-      if(err) {
-          sendStatus(500);
-      } else{
-          sendStatus(200);
-      }
-      
-  });
+app.post('/messages',async (req, res) => {
+  try{
+    const message = new Message(req.body); 
+    await message.save();
+    res.sendStatus(500);    
+  } catch(error) {
+    res.sendStatus(200);
+  } 
 }); 
 
 app.get('/logout',(req,res)=> {
@@ -60,7 +80,7 @@ app.get('/logout',(req,res)=> {
 
 // Listen on connection event for incoming sockets
 io.on('connection',function(socket){
-  console.log('connected on index called');
+  
  //emits an event to self 
   socket.emit("message", {
     text: "Welcome to Chat Appliction !",
@@ -68,7 +88,7 @@ io.on('connection',function(socket){
     name: "System"
   });
 
-   // listen ot joinRoom socket event trigger
+   // listen or joinRoom socket event trigger
    //req is {name:'',room:''}
    socket.on('joinRoom', function(req) {
     
@@ -147,4 +167,5 @@ function sendCurrentUsers(socket) { // loading current users
 //NOTE: using http.listen, socket requires http connection not express connection
 http.listen(PORT, ()=>{ 
     console.log(`Server started at port: ${PORT}`);
+    console.log(`http:/localhost:${PORT}`);
 });

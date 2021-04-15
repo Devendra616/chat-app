@@ -33,8 +33,7 @@ $(".room-title").text(`Room: ${room}`);
 /*
   Triggers when client successfully connected to the server
 */
-socket.on("connect", function() {
-  
+socket.on("connect", function() {  
   console.log("Connected to Socket I/O Server!");
   console.log(name + " wants to join  " + room);
   // to join a specific room, client sends joinRoom event to server
@@ -42,7 +41,15 @@ socket.on("connect", function() {
     name: name,
     room: room
   });
+  //get previous messages for that room
+  getMessages(room);
 });
+
+const getMessages = (room)=>{
+  $.get("/messages", (msgs) => {
+    console.log(msgs);
+  })
+}
 
 /* 
   Triggers when any client sends message to server
@@ -67,23 +74,24 @@ socket.on("message", function(message) {
   });
 
   // try notify , only when user has not open chat view
-  if (document[hidden]) {console.log('notifyme called');
+  if (document[hidden]) {
     notifyMe(message);
     // also notify server that user has not seen messgae
     var umsg = {
       text: name + " has not seen message",
       read: false
-    };
-    socket.emit("userSeen", umsg);
+    };    
   } else {
     // notify  server that user has seen message
     var umsg = {
       text: name + " has seen message",
       read: true,
       user: name
-    };
-    socket.emit("userSeen", umsg);
+    };    
   }
+  //send notification message to server 
+  socket.emit("userSeen", umsg);
+  
 });
 
 /* 
@@ -96,7 +104,7 @@ socket.on("userSeen", function(msg) {
      icon.addClass("fa fa-check-circle");
      if (msg.read) {
        //user read the message
-       icon.addClass("msg-read");
+       icon.addClass("msg-read");     
      } else {
        // message deleiverd but not read yet
        icon.addClass("msg-delivered");
@@ -140,7 +148,7 @@ $("#logout").on('click',function(){
 // handles submitting of new message
 var $form = $("#messageForm");
 var $message1 = $form.find('input[name=message]');
-$form.on("submit", function(event) {
+$form.on("submit",async function(event) {
   event.preventDefault();
   var msg = $message1.val(); 
   //prevent js injection attack
@@ -151,6 +159,12 @@ $form.on("submit", function(event) {
     text: msg,
     name: name
   });
+  //save message to db  
+  $.post("http://localhost:3000/messages", {
+    text: msg,
+    name: name
+  });
+
   // show user messageForm
   var $messages = $(".messages");
   var $message = $('<li class = "list-group-item mymessages"></li>');
@@ -177,8 +191,7 @@ $form.on("submit", function(event) {
 });
 
 // notification message
-function notifyMe(msg) {
- 
+function notifyMe(msg) { 
   // Let's check if the browser supports notifications
   if (!("Notification" in window)) {
     alert("This browser does not support desktop notification!");
