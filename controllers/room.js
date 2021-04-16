@@ -1,4 +1,4 @@
-export default {    
+module.exports = {    
     getAllMessages :async (req,res) => {},
     getMessageByRoom :async (req,res) => {},
     startMessage :async (req,res) => {},

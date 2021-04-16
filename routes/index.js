@@ -1,8 +1,8 @@
-import express from 'express';
+const express = require('express');
 //controller
-import users from '../controllers/users';
+const users = require('../controllers/users');
 //middleware
-import {encode} from '../middlewares/jwt';
+const {encode} = require('../middlewares/jwt');
 
 const router = express.Router();
 router
@@ -10,4 +10,4 @@ router
 
     });
 
-export default router;    
+module.exports = router;    

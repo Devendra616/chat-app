@@ -2,6 +2,7 @@ const PORT = process.env.PORT ||3000;
 const express = require('express');
 const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
+require('./config/mongo.js');
 const app = express();
 //moment js
 var moment = require("moment");
@@ -9,12 +10,12 @@ var moment = require("moment");
 var http = require("http").createServer(app);
 
 // routes
-import indexRouter from "./routes/index.js";
-import userRouter from "./routes/user.js";
-import roomRouter from "./routes/room.js";
-import deleteRouter from "./routes/delete.js";
+const indexRouter = require('./routes/index') 
+const userRouter  = require('./routes/user') 
+const roomRouter  = require('./routes/room')
+const deleteRouter = require('./routes/delete')
 // middlewares
-import { decode } from './middlewares/jwt.js'
+const { decode } = require('./middlewares/jwt.js');
 
 var clientInfo = {};
 //socket io module
@@ -38,15 +39,14 @@ app.use('*', (req, res) => {
 });
 
 //db configuration
-//const dbUrl = "mongodb://devendra:A1359chatapp@ds337718.mlab.com:37718/mlab-chat-app";
 const dbUrl = "mongodb+srv://dev:Ld2p7dIGYpcFrXFX@chatapp.hc2jt.mongodb.net/chat-app-db?retryWrites=true&w=majority";
-mongoose.connect(dbUrl, {useNewUrlParser:true,useUnifiedTopology: true },(err,msg) =>{
+/* mongoose.connect(dbUrl, {useNewUrlParser:true,useUnifiedTopology: true },(err,msg) =>{
     if(err){
         console.log("Error connection db! ", err);
     }else {
         console.log("Connected to db! ");
     }
-});
+}); */
 
  const Message = mongoose.model('Message',{
     name:String,

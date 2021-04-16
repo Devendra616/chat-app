@@ -1,6 +1,6 @@
-import express from 'express';
+const express = require('express');
 //controllers
-import {getAllMessages, getMessageByRoom,startMessage,sendMessage,markConversationReadByRoomId } from '../controllers/room';
+const {getAllMessages, getMessageByRoom,startMessage,sendMessage,markConversationReadByRoomId } = require('../controllers/room');
 const router = express.Router();
 
 router
@@ -10,4 +10,4 @@ router
   .post('/:roomId/message', sendMessage)
   .put('/:roomId/mark-read', markConversationReadByRoomId)
 
-export default router;
+  module.exports = router;  
