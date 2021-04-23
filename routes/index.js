@@ -5,6 +5,7 @@ const users = require('../controllers/users');
 const {encode} = require('../middlewares/jwt');
 
 const router = express.Router();
+
 router
     .post('/login/:userId',encode, (req,res,next)=>{
 

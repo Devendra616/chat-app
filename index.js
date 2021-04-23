@@ -2,12 +2,19 @@ const PORT = process.env.PORT ||3000;
 const express = require('express');
 const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
+// error handling helper function
+const {handleError, ErrorHandler} = require('./helper/error');
 require('./config/mongo.js');
 const app = express();
 //moment js
 var moment = require("moment");
 //socket.io needs http
 var http = require("http").createServer(app);
+
+//tell express to use static content from public
+app.use(express.static(__dirname+'/public'));
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({extended: false}));
 
 // routes
 const indexRouter = require('./routes/index') 
@@ -20,22 +27,18 @@ const { decode } = require('./middlewares/jwt.js');
 var clientInfo = {};
 //socket io module
 var io = require("socket.io")(http);
-//tell express to use static content from public
-app.use(express.static(__dirname+'/public'));
-app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({extended: false}));
+
 
 app.use("/", indexRouter);
 app.use("/users", userRouter);
 app.use("/room", decode, roomRouter);
 app.use("/delete", deleteRouter);
 
-/** catch 404 and forward to error handler */
-app.use('*', (req, res) => {
-  return res.status(404).json({
-    success: false,
-    message: 'API endpoint doesnt exist'
-  })
+/** If unknown route , catch 404 and forward to error handler */
+app.use((req, res,next) => {
+  const error = new Error('API endpoint doesnt exist');
+  error.statusCode = 404;
+  next(error);
 });
 
 //db configuration
@@ -53,18 +56,17 @@ const dbUrl = "mongodb+srv://dev:Ld2p7dIGYpcFrXFX@chatapp.hc2jt.mongodb.net/chat
     message:String
 });
  
-app.get('/', function(req, res){
-    //res.sendFile(__dirname + '/index.html');
-    res.sendFile('index.html');
+app.get('/', function(req, res,next){
+    res.sendFile(__dirname + '/index.html');
 });
 
-app.get('/messages', async (req, res) => {
+app.get('/messages', async (req, res,next) => {
   await Message.find({},(err, messages)=> {
     res.send(messages);
   })
 });
 
-app.post('/messages',async (req, res) => {
+app.post('/messages',async (req, res,next) => {
   try{
     const message = new Message(req.body); 
     await message.save();
@@ -74,7 +76,7 @@ app.post('/messages',async (req, res) => {
   } 
 }); 
 
-app.get('/logout',(req,res)=> {
+app.get('/logout',(req,res,next)=> {
 
 });
 
@@ -163,6 +165,15 @@ function sendCurrentUsers(socket) { // loading current users
     timestamp: moment().valueOf()
   });
 }
+
+/*  
+  error handling middleware
+  error handling middlewar must be last among other middleware and routes
+ */
+app.use((err,req,res,next) => {
+  
+    handleError(err,res);
+ });
 
 //NOTE: using http.listen, socket requires http connection not express connection
 http.listen(PORT, ()=>{ 
