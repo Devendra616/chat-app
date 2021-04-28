@@ -18,6 +18,7 @@ const userSchema = new mongoose.Schema({
 );
 
 /* 
+    Create a new user
     static method : allow for defining functions that exist directly on your Model.
     https://mongoosejs.com/docs/2.7.x/docs/methods-statics.html
 */
@@ -26,6 +27,41 @@ userSchema.statics.createUser = async function(firstName, lastName) {
         const user = await this.create({firstName, lastName});
         return user;
     } catch(error) {
+        throw error;
+    }
+}
+/* 
+    Shows information of existing user by id
+*/
+userSchema.statics.getUserById = async function(id) {
+    try {
+        const user = await this.findOne({ _id: id });
+        if(!user) {
+            throw ({ error: 'No user with this id found' });
+        }        
+        return user;
+    } catch(error) {
+        throw error;
+    }
+}
+
+/* 
+    Get all users
+*/
+userSchema.statics.getUsers = async function() {
+    try {
+        const users = await this.find({});           
+        return users;
+    } catch(error) {
+        throw error;
+    }
+}
+
+userSchema.statics.deleteUserById = async function(id) {
+    try {
+        const result = await this.deleteOne ({_id:id});console.log(result)
+        return result;
+    } catch (error) {
         throw error;
     }
 }

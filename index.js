@@ -1,3 +1,4 @@
+require('dotenv').config(); //must be first line
 const PORT = process.env.PORT ||3000;
 const express = require('express');
 const mongoose = require('mongoose');
@@ -167,12 +168,14 @@ function sendCurrentUsers(socket) { // loading current users
 }
 
 /*  
-  error handling middleware
+  Express error handling middleware
   error handling middlewar must be last among other middleware and routes
  */
-app.use((err,req,res,next) => {
-  
-    handleError(err,res);
+app.use((err,req,res,next) => {  
+  const { statusCode, message } = err; 
+  err.statusCode = err.statusCode || 400; //set default code
+  err.message = err.message || 'Some unknown error occured'; //set default message
+  handleError(err,res);
  });
 
 //NOTE: using http.listen, socket requires http connection not express connection

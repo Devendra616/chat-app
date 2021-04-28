@@ -8,7 +8,7 @@ const resultsOfValidation = (req,res,next) => {
     if(errors.isEmpty()) {
         return next(); //pass to controller
     }
-    errors.array().map( err => messages.push(err.msg));   
+    errors.array().map( err => messages.push({[err.param]:err.msg}));   
     throw new ErrorHandler(400,messages);
 }
 
@@ -35,6 +35,6 @@ const otherValiadator = () => {
 
 module.exports = {
     resultsOfValidation,
-    createUserValidator,
+    createUserValidator,    
     otherValiadator
 }
