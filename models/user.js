@@ -27,6 +27,7 @@ userSchema.statics.createUser = async function(firstName, lastName) {
         const user = await this.create({firstName, lastName});
         return user;
     } catch(error) {
+        console.log('error on createUser method', error);
         throw error;
     }
 }
@@ -41,6 +42,7 @@ userSchema.statics.getUserById = async function(id) {
         }        
         return user;
     } catch(error) {
+        console.log('error on getUserById method', error);
         throw error;
     }
 }
