@@ -15,9 +15,9 @@ const roomSchema = new mongoose.Schema({
     }
 );
 
-roomSchema.statics.initateChat = async function(userIds,chatInitiator) {
+roomSchema.statics.initiateChat = async function(userIds,chatInitiator) {
     try {
-        const availableRooms = this.findOne({
+        const availableRooms = await this.findOne({
             // match for all userids having same roomid
             userIds: {
                 $size: userIds.length,
@@ -25,7 +25,8 @@ roomSchema.statics.initateChat = async function(userIds,chatInitiator) {
             }
         });
         if(availableRooms) { 
-            console.log(availableRooms);
+        console.log("🚀 ~ file: room.js ~ line 28 ~ roomSchema.statics.initiateChat=function ~ availableRooms", availableRooms);
+            
             return {
                 isNew: false,
                 message: 'retrieving an old chat room',
@@ -38,10 +39,14 @@ roomSchema.statics.initateChat = async function(userIds,chatInitiator) {
         return {
             isNew : true,
             message: 'creating a new room',
-            roomId: newroom._doc._id;
+            roomId: newRoom._doc._id,
         }
     } catch (error) {
         console.log('error on start chat method', error);
         throw error;
     }
 }
+
+const RoomModel = mongoose.model("Room", roomSchema);
+
+module.exports = RoomModel;

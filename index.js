@@ -40,7 +40,7 @@ app.use((req, res,next) => {
   const error = new Error('API endpoint doesnt exist');
   error.statusCode = 404;
   next(error);
-});
+}); 
 
 //db configuration
 const dbUrl = "mongodb+srv://dev:Ld2p7dIGYpcFrXFX@chatapp.hc2jt.mongodb.net/chat-app-db?retryWrites=true&w=majority";

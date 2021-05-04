@@ -1,6 +1,6 @@
 const jwt = require('jsonwebtoken');
 const UserModel  = require('../models/user');
-const SECRET = process.env.JWT_SECRET;
+const SECRET_KEY = process.env.JWT_SECRET;
 
 const encode = async (req,res,next) => {
     try {
@@ -9,7 +9,7 @@ const encode = async (req,res,next) => {
         const payload = {
             userId: user._id,
         }
-        const token = jwt.sign(payload,SECRET,{ expiresIn: 60 * 60 } ); //1 hr expiry
+        const token = jwt.sign(payload,SECRET_KEY,{ expiresIn: 60 * 60 } ); //1 hr expiry
         console.log("authtoken is: ",token);
         req.authToken = token; //forward the authtoken to next function after middleware
         next();
@@ -28,10 +28,10 @@ const decode = (req,res,next) => {
     if (!token) return res.status(401).send("Access denied. No token provided.");
     //authorization: Bearer <auth-token>
     const accessToken = req.headers.authorization.split(' ')[1];
+    
     try {
         const decoded = jwt.verify(accessToken, SECRET_KEY);
         req.userId = decoded.userId;
-        
         return next();
     } catch (error) {
         return res.status(401).json({ success: false, message: error.message });

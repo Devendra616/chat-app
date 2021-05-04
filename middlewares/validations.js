@@ -3,7 +3,7 @@ const { check, validationResult } = require('express-validator')
 const {handleError, ErrorHandler} = require('../helper/error');
 
 const resultsOfValidation = (req,res,next) => {
-    const messages = []; 
+    const messages = []; console.log('inside result of vaidation')
     const errors = validationResult(req); 
     if(errors.isEmpty()) {
         return next(); //pass to controller
@@ -28,13 +28,26 @@ const createUserValidator = () => {
     ]
 }
 
-// modify for other validations if any
-const otherValiadator = () => {
+const initiateChatValidator = () => {
+    return [
+        check('userIds')
+            .isArray({min:1}).withMessage('User Ids must be an non-empty array')            
+    ]
+}
 
+// modify for other validations if any
+const sendMessageValidator = () => {
+    return [
+        check('message')
+        .exists({ checkFalsy: true }).withMessage('Blank message should not be sent!')
+        .bail()
+    ]
 }
 
 module.exports = {
     resultsOfValidation,
-    createUserValidator,    
-    otherValiadator
+    createUserValidator,  
+    initiateChatValidator, 
+    sendMessageValidator, 
+    
 }
