@@ -38,7 +38,7 @@ userSchema.statics.getUserById = async function(id) {
     try {
         const user = await this.findOne({ _id: id });
         if(!user) {
-            throw ({ error: 'No user with this id found' });
+            throw ('No user with this id found');
         }        
         return user;
     } catch(error) {
@@ -53,6 +53,18 @@ userSchema.statics.getUserById = async function(id) {
 userSchema.statics.getUsers = async function() {
     try {
         const users = await this.find({});           
+        return users;
+    } catch(error) {
+        throw error;
+    }
+}
+
+/* 
+    get users with ids 
+*/
+userSchema.statics.getUserByIds = async function(userIds){
+    try{
+        const users = await this.find({_id: {$in: userIds}});
         return users;
     } catch(error) {
         throw error;

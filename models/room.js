@@ -47,6 +47,30 @@ roomSchema.statics.initiateChat = async function(userIds,chatInitiator) {
     }
 }
 
+roomSchema.statics.getChatRoomById = async function(roomId) {
+    try {
+        const room = await this.findOne({_id:roomId});
+        console.log("🚀 ~ file: room.js ~ line 53 ~ roomSchema.statics.getChatRoomById=function ~ room", room);
+        return room;
+    } catch(error) {
+        console.log('error on getChatRoomById method', error);
+        throw error;
+    }
+}
+
+/* 
+    Returns chat rooms object that the user belongs to
+*/
+roomSchema.statics.getRoomByUserId = async function(userId) {
+    try {
+        const rooms = await this.find({userIds: {$all:[userId]}});        
+        return rooms;
+    } catch(error) {
+        console.log('error on getChatRoomByUserId method', error);
+        throw error;
+    }
+}
+
 const RoomModel = mongoose.model("Room", roomSchema);
 
 module.exports = RoomModel;

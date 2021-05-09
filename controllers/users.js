@@ -27,13 +27,14 @@ module.exports = {
             //return res.status(500).json({ success: false, error: error })
           }
     },
-    getUserById: async (req,res, next)=> {    
-         const user = await UserModel.getUserById(req.params.id)
-                    .catch(next);
-        if(!user) {
-            return res.status(200).json({"message":"No user found!"});
+    getUserById: async (req,res, next)=> {   
+        try {
+            const user = await UserModel.getUserById(req.params.id);           
+            return user;
+        } catch(error) {
+            throw new ErrorHandler(500, error);
         }
-         return res.status(200).json({ success: true, user });
+        
             /* if(!user) {
                 throw new ErrorHandler(204,"No User Found");
             }console.log(user)
@@ -44,7 +45,7 @@ module.exports = {
     },
     deleteUserById: async (req,res,next)=> {
         const user = await UserModel.deleteUserById(req.params.id)
-                                    .catch(next);
+                                   
         if(!user) {
             return res.status(200).json({"message": "No user existed with that id"});
         }

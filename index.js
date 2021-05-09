@@ -171,10 +171,10 @@ function sendCurrentUsers(socket) { // loading current users
   Express error handling middleware
   error handling middlewar must be last among other middleware and routes
  */
-app.use((err,req,res,next) => {  
-  const { statusCode, message } = err; 
-  err.statusCode = err.statusCode || 400; //set default code
-  err.message = err.message || 'Some unknown error occured'; //set default message
+app.use((err,req,res,next) => { 
+  const { statusCode, message } = err; console.log("index error handling")
+  err.statusCode = statusCode || 400; //set default code
+  err.message = message || 'Some unknown error occured'; //set default message
   handleError(err,res);
  });
 
