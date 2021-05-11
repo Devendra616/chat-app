@@ -41,6 +41,7 @@ const chatMessageSchema = new mongoose.Schema(
  */
 chatMessageSchema.statics.createPostInChatRoom =  async function(chatRoomId, message, postedByUser) {
     try {
+      
         const post = await this.create({
             chatRoomId,
             message,
@@ -61,7 +62,7 @@ chatMessageSchema.statics.createPostInChatRoom =  async function(chatRoomId, mes
               }
             },
             { $unwind: '$postedByUser' },
-            // do a join on another table called chatrooms, and 
+            // do a join on another table called room, and 
             // get me a chatroom whose _id = chatRoomId
             {
               $lookup: {
@@ -75,7 +76,7 @@ chatMessageSchema.statics.createPostInChatRoom =  async function(chatRoomId, mes
             { $unwind: '$chatRoomInfo.userIds' },
             // do a join on another table called users, and 
             // get me a user whose _id = userIds
-           {
+          {
               $lookup: {
                 from: 'users',
                 localField: 'chatRoomInfo.userIds',
@@ -90,20 +91,20 @@ chatMessageSchema.statics.createPostInChatRoom =  async function(chatRoomId, mes
                 _id: '$chatRoomInfo._id',
                 postId: { $last: '$_id' },
                 chatRoomId: { $last: '$chatRoomInfo._id' },
-                message: { $last: '$message' },
-                type: { $last: '$type' },
+                message: { $last: '$message' },               
                 postedByUser: { $last: '$postedByUser' },
-                readByRecipients: { $last: '$readByRecipients' },
+                readByRecipents: { $last: '$readByRecipents' },
                 chatRoomInfo: { $addToSet: '$chatRoomInfo.userProfile' },
                 createdAt: { $last: '$createdAt' },
                 updatedAt: { $last: '$updatedAt' },
               }
             } 
-          ]);
-          console.log("🚀 ~ file: chatmessages.js ~ line 101 ~ chatMessageSchema.statics.createPostInChatRoom=function ~ aggregate", aggregate);
+          ]);         
+          console.log("🚀 ~ file: chatmessages.js ~ line 108 ~ chatMessageSchema.statics.createPostInChatRoom=function ~ aggregate", aggregate);
           return aggregate[0];
-    } catch(er){
-        throw er;
+    } catch(error){
+      console.log("🚀 ~ file: chatmessages.js ~ line 105 ~ chatMessageSchema.statics.createPostInChatRoom=function ~ error", error);
+      throw error;
     }
 }
 
@@ -132,7 +133,7 @@ chatMessageSchema.statics.getConversationByRoomId = async function(roomId, optio
       {$sort: {createdAt: 1}},
     ])
   }catch(error){
-    console.log(error);
+    console.log("🚀 ~ file: chatmessages.js ~ line 135 ~ chatMessageSchema.statics.getConversationByRoomId=function ~ error", error);    
     throw error;
   }
 }
@@ -158,8 +159,8 @@ chatMessageSchema.statics.markMessageRead = async function(chatRoomId, user) {
       }
     )
   } catch(error) {
-    console.log(error);
-    throw error;
+      console.log("🚀 ~ file: chatmessages.js ~ line 162 ~ chatMessageSchema.statics.markMessageRead=function ~ error", error);
+      throw error;
   }
 }
 
@@ -244,7 +245,7 @@ chatMessageSchema.statics.getRecentConversation = async function(roomIds, option
       {$limit: options.limit}, 
     ])
   } catch(error) {
-      console.log(error);
+    console.log("🚀 ~ file: chatmessages.js ~ line 247~ chatMessageSchema.statics.getRecentConversation=function ~ error", error);
     throw error;
   }
 }

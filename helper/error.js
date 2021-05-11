@@ -1,22 +1,27 @@
 // Handle error
-class ErrorHandler extends Error {
-    constructor(statusCode,message) {
-        super();
-        this.statusCode = statusCode;
+class GeneralError extends Error {
+    constructor(message) {
+        super();        
         this.message = message;
+    }
+
+    // set error status code
+    getCode() {
+      if(this instanceof BadRequest) {
+        return 400;
+      } 
+      if(this instanceof NotFound) {
+        return 404;
+      }
+      return 500;
     }
 }
 
-// Returning formatted error message
-const handleError = (err, res) => { 
-    const { statusCode, message } = err; 
-    res.status(statusCode).json({
-      statusCode,
-      message
-    });
-  };
+class BadRequest extends GeneralError { }
+class NotFound extends GeneralError { }
 
 module.exports = {
-    ErrorHandler, 
-    handleError
+    GeneralError, 
+    BadRequest,
+    NotFound,
 }

@@ -11,4 +11,4 @@ router
   .post('/:roomId/message',sendMessageValidator(), resultsOfValidation ,sendMessage)
   .put('/:roomId/mark-read', markConversationReadByRoomId)
 
-  module.exports = router;  
+  module.exports = router;

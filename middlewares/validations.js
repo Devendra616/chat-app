@@ -1,15 +1,15 @@
 
 const { check, validationResult } = require('express-validator')
-const {handleError, ErrorHandler} = require('../helper/error');
+const {BadRequest,NotFound } = require('../helper/error');
 
 const resultsOfValidation = (req,res,next) => {
-    const messages = []; console.log('inside result of vaidation')
+    const messages = [];
     const errors = validationResult(req); 
     if(errors.isEmpty()) {
         return next(); //pass to controller
     }
     errors.array().map( err => messages.push({[err.param]:err.msg}));   
-    throw new ErrorHandler(400,messages);
+    throw new BadRequest(messages);
 }
 
 const createUserValidator = () => {
@@ -23,7 +23,7 @@ const createUserValidator = () => {
         ,
         check('lastName')
             .optional({ checkFalsy: true }) //ignore validation when null or empty
-            .isAlpha()
+            .isAlpha().withMessage('Last Name should have only alphabets')
             .bail()            
     ]
 }

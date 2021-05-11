@@ -37,12 +37,13 @@ userSchema.statics.createUser = async function(firstName, lastName) {
 userSchema.statics.getUserById = async function(id) {
     try {
         const user = await this.findOne({ _id: id });
+       
         if(!user) {
-            throw ('No user with this id found');
+            throw (`No user with Id ${id} found.`);
         }        
         return user;
     } catch(error) {
-        console.log('error on getUserById method', error);
+        console.log("🚀 ~ file: user.js ~ line 46 ~ userSchema.statics.getUserById=function ~ error", error);        
         throw error;
     }
 }
@@ -73,7 +74,7 @@ userSchema.statics.getUserByIds = async function(userIds){
 
 userSchema.statics.deleteUserById = async function(id) {
     try {
-        const result = await this.deleteOne ({_id:id});console.log(result)
+        const result = await this.deleteOne ({_id:id});        
         return result;
     } catch (error) {
         throw error;

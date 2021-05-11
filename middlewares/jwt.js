@@ -1,23 +1,21 @@
 const jwt = require('jsonwebtoken');
+const {BadRequest} = require('../helper/error');
 const UserModel  = require('../models/user');
 const SECRET_KEY = process.env.JWT_SECRET;
 
 const encode = async (req,res,next) => {
-    try {
-        const {userId} = req.params;
+    try {        
+        const {userId} = req.params;        
         const user =  await UserModel.getUserById(userId);
         const payload = {
             userId: user._id,
         }
-        const token = jwt.sign(payload,SECRET_KEY,{ expiresIn: 60 * 60 } ); //1 hr expiry
-        console.log("authtoken is: ",token);
+        const token = jwt.sign(payload,SECRET_KEY,{ expiresIn: 60 * 60 } ); //1 hr expiry        
         req.authToken = token; //forward the authtoken to next function after middleware
         next();
     } catch(error) {
-        return res.status(400).json({
-            success:false,
-            message: error.error
-        })
+        console.log("🚀 ~ file: jwt.js ~ line 16 ~ encode ~ error", error);
+        next(error);
     }
 };
 
@@ -25,7 +23,10 @@ const decode = (req,res,next) => {
     //get the token from the header if present
     const token = req.headers["x-access-token"] || req.headers["authorization"];
     //if no token found, return response (without going to the next middelware)
-    if (!token) return res.status(401).send("Access denied. No token provided.");
+    if (!token) {
+     throw new BadRequest("Access denied. No token provided.");
+    }
+        
     //authorization: Bearer <auth-token>
     const accessToken = req.headers.authorization.split(' ')[1];
     
@@ -34,9 +35,9 @@ const decode = (req,res,next) => {
         req.userId = decoded.userId;
         return next();
     } catch (error) {
-        return res.status(401).json({ success: false, message: error.message });
+        console.log("🚀 ~ file: jwt.js ~ line 37 ~ decode ~ error", error);
+        next(error);
     }
-
 };
 
 module.exports = {encode,decode}

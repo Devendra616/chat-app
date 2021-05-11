@@ -1,57 +1,51 @@
 
 const UserModel = require('../models/user');
-const {handleError, ErrorHandler} = require('../helper/error');
-const {resultsOfValidation} = require('../middlewares/validations');
 
 module.exports = {
     getAllUsers: async (req,res,next)=> {
-        const users = await UserModel.getUsers()
-                            .catch(next);
-        if(!users) {
-            return res.status(200).json({"message":"No users found!"});
+        try{
+            const users = await UserModel.getUsers()
+                                .catch(next);
+            if(!users) {
+                return res.status(200).json({"message":"No users found!"});
+            }
+            return res.status(200).json({success:true, users});
+        } catch(error){            
+            console.log("🚀 ~ file: users.js ~ line 16 ~ getAllUsers: ~ error", error);
+            next(error);  
         }
-        return res.status(200).json({success:true, users});
     },
     createUser: async (req,res,next)=> {
         try{           
             const { firstName, lastName } = req.body;
             // call createUser from model
-            const user = await UserModel.createUser(firstName, lastName); 
-            if(!user) {
-                throw new ErrorHandler(404, 'User not created')
-            }
-          
-           return res.status(200).json({ success: true, user });
-          } catch (error) {          
-            throw new ErrorHandler(500, error)
-            //return res.status(500).json({ success: false, error: error })
+            const user = await UserModel.createUser(firstName, lastName);                       
+            return res.status(200).json({ success: true, user });
+          } catch (error) {
+             console.log("🚀 ~ file: users.js ~ line 22 ~ createUser: ~ error", error);             
+             next(error);           
           }
     },
     getUserById: async (req,res, next)=> {   
         try {
             const user = await UserModel.getUserById(req.params.id);           
-            return user;
-        } catch(error) {
-            throw new ErrorHandler(500, error);
-        }
-        
-            /* if(!user) {
-                throw new ErrorHandler(204,"No User Found");
-            }console.log(user)
             return res.status(200).json({ success: true, user });
-        } catch (err) { console.log('in error',err)
-           throw new ErrorHandler(400, err);
-        } */
+        } catch(error) {
+            console.log("🚀 ~ file: users.js ~ line 31 ~ getUserById: ~ error", error);            
+            next(error);
+        }
     },
     deleteUserById: async (req,res,next)=> {
-        const user = await UserModel.deleteUserById(req.params.id)
-                                   
-        if(!user) {
-            return res.status(200).json({"message": "No user existed with that id"});
+        try{
+            const user = await UserModel.deleteUserById(req.params.id);                                                   
+            console.log("🚀 ~ file: users.js ~ line 43 ~ deleteUserById: ~ user", user);
+            return res.status(200).json({
+                success:true,
+                message: `Deleted ${user.deletedCount} user`
+            })
+        } catch(error){
+            console.log("🚀 ~ file: users.js ~ line 52 ~ deleteUserById: ~ error", error);
+            next(error);
         }
-        return res.status(200).json({
-            success:true,
-            message: `Deleted ${user.deletedCount} user`
-        })
     },   
 }

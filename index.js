@@ -3,8 +3,9 @@ const PORT = process.env.PORT ||3000;
 const express = require('express');
 const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
-// error handling helper function
-const {handleError, ErrorHandler} = require('./helper/error');
+// error handling middleware
+const handleErrors = require('./middlewares/handleError');
+const {BadRequest,NotFound } = require('./helper/error');
 require('./config/mongo.js');
 const app = express();
 //moment js
@@ -37,9 +38,7 @@ app.use("/delete", deleteRouter);
 
 /** If unknown route , catch 404 and forward to error handler */
 app.use((req, res,next) => {
-  const error = new Error('API endpoint doesnt exist');
-  error.statusCode = 404;
-  next(error);
+  throw new NotFound('API endpoint doesnt exist');  
 }); 
 
 //db configuration
@@ -171,12 +170,7 @@ function sendCurrentUsers(socket) { // loading current users
   Express error handling middleware
   error handling middlewar must be last among other middleware and routes
  */
-app.use((err,req,res,next) => { 
-  const { statusCode, message } = err; console.log("index error handling")
-  err.statusCode = statusCode || 400; //set default code
-  err.message = message || 'Some unknown error occured'; //set default message
-  handleError(err,res);
- });
+app.use(handleErrors);
 
 //NOTE: using http.listen, socket requires http connection not express connection
 http.listen(PORT, ()=>{ 

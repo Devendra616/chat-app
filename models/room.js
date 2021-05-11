@@ -1,5 +1,6 @@
 const mongoose = require('mongoose');
 const {v4: uuidv4 } = require('uuid');
+const UserModel = require('./user');
 
 const roomSchema = new mongoose.Schema({
     _id: {
@@ -17,6 +18,25 @@ const roomSchema = new mongoose.Schema({
 
 roomSchema.statics.initiateChat = async function(userIds,chatInitiator) {
     try {
+    /*     // return array of Promises
+        const promises = userIds.map(async userId => {
+          return await UserModel.getUserById(userId);          
+        });
+        for await (let val of promises ) {
+            if (!val) {
+                console.log("🚀 ~ file: room.js ~ line 27 ~ forawait ~ val", val);
+                throw error;
+            }
+        }  */
+        
+        const isValidUser = await Promise.all( userIds.map(async userId => {
+            try{
+                return await UserModel.getUserById(userId);
+            } catch(error){
+                throw error;
+            }
+        }));
+
         const availableRooms = await this.findOne({
             // match for all userids having same roomid
             userIds: {
@@ -24,9 +44,7 @@ roomSchema.statics.initiateChat = async function(userIds,chatInitiator) {
                 $all: [...userIds], 
             }
         });
-        if(availableRooms) { 
-        console.log("🚀 ~ file: room.js ~ line 28 ~ roomSchema.statics.initiateChat=function ~ availableRooms", availableRooms);
-            
+        if(availableRooms) {         
             return {
                 isNew: false,
                 message: 'retrieving an old chat room',
@@ -42,7 +60,7 @@ roomSchema.statics.initiateChat = async function(userIds,chatInitiator) {
             roomId: newRoom._doc._id,
         }
     } catch (error) {
-        console.log('error on start chat method', error);
+        console.log("🚀 ~ file: room.js ~ line 44 ~ roomSchema.statics.initiateChat=function ~ error", error);
         throw error;
     }
 }
@@ -53,7 +71,7 @@ roomSchema.statics.getChatRoomById = async function(roomId) {
         console.log("🚀 ~ file: room.js ~ line 53 ~ roomSchema.statics.getChatRoomById=function ~ room", room);
         return room;
     } catch(error) {
-        console.log('error on getChatRoomById method', error);
+        console.log("🚀 ~ file: room.js ~ line 55 ~ roomSchema.statics.getChatRoomById=function ~ error", error);
         throw error;
     }
 }
@@ -66,7 +84,7 @@ roomSchema.statics.getRoomByUserId = async function(userId) {
         const rooms = await this.find({userIds: {$all:[userId]}});        
         return rooms;
     } catch(error) {
-        console.log('error on getChatRoomByUserId method', error);
+        console.log("🚀 ~ file: room.js ~ line 68 ~ roomSchema.statics.getRoomByUserId=function ~ error", error);
         throw error;
     }
 }
