@@ -1,7 +1,7 @@
 const RoomModel = require('../models/room');
 const UserModel = require('../models/user');
 const ChatmessageModel = require('../models/chatmessages');
-const users = require('./users');
+
 const {BadRequest,NotFound} = require('../helper/error');
 
 module.exports = {    
