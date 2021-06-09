@@ -1,17 +1,23 @@
 const jwt = require('jsonwebtoken');
 const {BadRequest} = require('../helper/error');
+const SapModel = require('../models/sapid');
 const UserModel  = require('../models/user');
 const SECRET_KEY = process.env.JWT_SECRET;
 
 const encode = async (req,res,next) => {
     try {        
-        const {userId} = req.params;        
-        const user =  await UserModel.getUserById(userId);
-        const payload = {
-            userId: user._id,
+        const {sapid} = req.body;        
+        const user =  await SapModel.getUserBySAPId(sapid);
+        console.log("🚀 ~ file: jwt.js ~ line 11 ~ encode ~ user", user);
+        if(user.error) {
+            req.errorMessage = user.error;          
+        } else{
+            const payload = {
+                userId: user._id,
+            }
+            const token = jwt.sign(payload,SECRET_KEY,{ expiresIn: 60 * 60 } ); //1 hr expiry        
+            req.authToken = token; //forward the authtoken to next function after middleware
         }
-        const token = jwt.sign(payload,SECRET_KEY,{ expiresIn: 60 * 60 } ); //1 hr expiry        
-        req.authToken = token; //forward the authtoken to next function after middleware
         next();
     } catch(error) {
         console.log("🚀 ~ file: jwt.js ~ line 16 ~ encode ~ error", error);

@@ -42,8 +42,9 @@ app.use((req, res,next) => {
 }); 
 
 //db configuration
+/*
 const dbUrl = "mongodb+srv://dev:Ld2p7dIGYpcFrXFX@chatapp.hc2jt.mongodb.net/chat-app-db?retryWrites=true&w=majority";
-/* mongoose.connect(dbUrl, {useNewUrlParser:true,useUnifiedTopology: true },(err,msg) =>{
+ mongoose.connect(dbUrl, {useNewUrlParser:true,useUnifiedTopology: true },(err,msg) =>{
     if(err){
         console.log("Error connection db! ", err);
     }else {
@@ -57,7 +58,7 @@ const dbUrl = "mongodb+srv://dev:Ld2p7dIGYpcFrXFX@chatapp.hc2jt.mongodb.net/chat
 });
  
 app.get('/', function(req, res,next){
-    res.sendFile(__dirname + '/index.html');
+    res.sendFile(__dirname + '/index2.html');
 });
 
 app.get('/messages', async (req, res,next) => {

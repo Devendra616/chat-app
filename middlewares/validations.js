@@ -14,7 +14,21 @@ const resultsOfValidation = (req,res,next) => {
 
 const createUserValidator = () => {
     return [
-        check('firstName')
+
+        check('sapid')
+            .exists({ checkFalsy: true }).withMessage('SAP ID is mandatory')
+            .bail()
+            .isNumeric().withMessage('SAP ID should have all numbers') 
+            .bail()
+            .isLength({min:6, max:8}).withMessage('First Name should have minimum 6, max 8 characters')
+        ,
+       /*  check('password')
+            .exists({ checkFalsy: true }).withMessage('Password is mandatory')
+            .bail()            
+            .isLength({min:5}).withMessage('Password should have minimum 5 characters')
+        , */
+
+        /* check('firstName')
             .exists({ checkFalsy: true }).withMessage('First Name is mandatory')
             .bail()
             .isAlpha().withMessage('First Name should have all alphabets') 
@@ -24,10 +38,31 @@ const createUserValidator = () => {
         check('lastName')
             .optional({ checkFalsy: true }) //ignore validation when null or empty
             .isAlpha().withMessage('Last Name should have only alphabets')
-            .bail()            
+            .bail()   */          
     ]
 }
 
+const createSapUserValidator = () => {
+    return [
+        check('sapid')
+            .exists({ checkFalsy: true }).withMessage('SAP ID is mandatory')
+            .bail()
+            .isNumeric().withMessage('SAP ID should have all numbers') 
+            .bail()
+            .isLength({min:6, max:8}).withMessage('First Name should have minimum 6, max 8 characters')
+        ,
+        check('firstName')
+            .exists({ checkFalsy: true }).withMessage('First Name is mandatory')
+            .bail()            
+            .isAlpha().withMessage('First Name should have only alphabets')
+            .bail()  
+        ,              
+        check('lastName')
+            .optional({ checkFalsy: true }) //ignore validation when null or empty
+            .isAlpha().withMessage('Last Name should have only alphabets')
+            .bail()            
+    ]
+}
 const initiateChatValidator = () => {
     return [
         check('userIds')
@@ -49,5 +84,5 @@ module.exports = {
     createUserValidator,  
     initiateChatValidator, 
     sendMessageValidator, 
-    
+    createSapUserValidator,
 }

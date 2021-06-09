@@ -1,11 +1,13 @@
 
 const UserModel = require('../models/user');
+const SapModel = require('../models/sapid');
 
 module.exports = {
     getAllUsers: async (req,res,next)=> {
         try{
             const users = await UserModel.getUsers()
-                                .catch(next);
+            .catch(next);
+            
             if(!users) {
                 return res.status(200).json({"message":"No users found!"});
             }
@@ -17,21 +19,21 @@ module.exports = {
     },
     createUser: async (req,res,next)=> {
         try{           
-            const { firstName, lastName } = req.body;
+            const { sapid, password } = req.body;
             // call createUser from model
-            const user = await UserModel.createUser(firstName, lastName);                       
+            const user = await UserModel.createUser(sapid, password);                       
             return res.status(200).json({ success: true, user });
           } catch (error) {
              console.log("🚀 ~ file: users.js ~ line 22 ~ createUser: ~ error", error);             
              next(error);           
           }
     },
-    getUserById: async (req,res, next)=> {   
+    getUserBySAPId: async (req,res, next)=> {   
         try {
-            const user = await UserModel.getUserById(req.params.id);           
+            const user = await SapModel.getUserBySAPId(req.body.sapid);           
             return res.status(200).json({ success: true, user });
         } catch(error) {
-            console.log("🚀 ~ file: users.js ~ line 31 ~ getUserById: ~ error", error);            
+            console.log("🚀 ~ file: users.js ~ line 31 ~ getUserBySAPId: ~ error", error);            
             next(error);
         }
     },
@@ -47,5 +49,14 @@ module.exports = {
             console.log("🚀 ~ file: users.js ~ line 52 ~ deleteUserById: ~ error", error);
             next(error);
         }
-    },   
+    }, 
+    createSapId: async(req,res,next)  => {
+        try{
+            const {sapid, firstName, lastName, department, project} = req.body;
+            const sapUser = await SapModel.createSapId(sapid, firstName, lastName, department, project);
+            return res.status(200).json({success:true, sapUser})
+        }catch (error) {            
+            next(error);           
+         }
+    }
 }
