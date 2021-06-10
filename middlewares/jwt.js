@@ -1,4 +1,5 @@
 const jwt = require('jsonwebtoken');
+
 const {BadRequest} = require('../helper/error');
 const SapModel = require('../models/sapid');
 const UserModel  = require('../models/user');
@@ -6,9 +7,10 @@ const SECRET_KEY = process.env.JWT_SECRET;
 
 const encode = async (req,res,next) => {
     try {        
-        const {sapid} = req.body;        
-        const user =  await SapModel.getUserBySAPId(sapid);
-        console.log("🚀 ~ file: jwt.js ~ line 11 ~ encode ~ user", user);
+        const {sapid, password} = req.body;        
+        const user =  await UserModel.isValidUser(sapid,password);
+        console.log("🚀 ~ file: jwt.js ~ line 12 ~ encode ~ user", user);
+        
         if(user.error) {
             req.errorMessage = user.error;          
         } else{

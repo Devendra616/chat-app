@@ -1,4 +1,7 @@
 const mongoose = require('mongoose');
+const bcrypt = require('bcrypt');
+
+const saltRounds = 10;
 const ObjectId = mongoose.Types.ObjectId;
 
 const sapidSchema = new mongoose.Schema({

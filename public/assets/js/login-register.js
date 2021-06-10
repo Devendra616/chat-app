@@ -50,29 +50,31 @@ function loginAjax(){
     const formData = {
         sapid,password
     }
+    if(!sapid || !password) {
+        shakeModal();
+    }
+
     $.post("/login", formData).done(function (data){
         console.log("🚀 ~ file: login-register.js ~ line 49 ~ $.post ~ data", data);
         
         if(data.error) {
             shakeModal(data.error);
-        } else if(data){
-                window.location.replace("/chat.html");            
-            } else {
-                 shakeModal(); 
-            }
+        } else if(data.success){
+            window.location.replace("/chat.html");            
+        } else {
+            shakeModal(); 
+        }
     })
 /*   Simulate error message from the server   */
     // shakeModal();
 }
 
-function shakeModal(message){
+function shakeModal(message) {
     const displayMessage = message || "Invalid SAP ID/Password combination";
     $('#loginModal .modal-dialog').addClass('shake');
-             $('.error').addClass('alert alert-danger').html(displayMessage);
-             $('input[type="password"]').val('');
-             setTimeout( function(){ 
+            $('.error').addClass('alert alert-danger').html(displayMessage);
+            $('input[type="password"]').val('');
+            setTimeout( function() { 
                 $('#loginModal .modal-dialog').removeClass('shake'); 
-    }, 1000 ); 
+    }, 1000); 
 }
-
-   
