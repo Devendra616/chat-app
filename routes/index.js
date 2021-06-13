@@ -1,19 +1,18 @@
-const express = require('express');
+const express = require("express");
 //controller
-const users = require('../controllers/users');
+const users = require("../controllers/users");
 //middleware
-const {encode} = require('../middlewares/jwt');
+const { encode } = require("../middlewares/jwt");
 
 const router = express.Router();
 
-router
-    .post('/login/',encode, (req,res,next)=>{
-        return res.status(200).json({
-            success:true,
-            authorization: req.authToken,
-            error:req.errorMessage
-        })
-    })
-    
+router.post("/login/", encode, (req, res, next) => {
+  return res.status(200).json({
+    success: true,
+    authorization: req.authToken,
+    name: req.userName,
+    error: req.errorMessage,
+  });
+});
 
-module.exports = router;    
+module.exports = router;
