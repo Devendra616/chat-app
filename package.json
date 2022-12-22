@@ -22,7 +22,7 @@
     "express": "^4.17.1",
     "express-validator": "^6.10.0",
     "http": "0.0.0",
-    "jsonwebtoken": "^8.5.1",
+    "jsonwebtoken": "^9.0.0",
     "moment": "^2.29.1",
     "mongoose": "^5.12.3",
     "socket.io": "^2.4.1",
